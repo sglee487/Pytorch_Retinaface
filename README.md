@@ -1,7 +1,8 @@
 # RetinaFace in PyTorch
 
-This is a personal extra code from [Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface) which is [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641). 
-I tried to replace mobilenet0.25 backbone with mobilenetv3_small and mobilenetv3_large in [torchvision](https://pytorch.org/vision/0.8/models.html). Each size of backbone model mobilenet0.25, mobilenetv3_small and mobilenetv3_large is 1.7M, 1.4M and 11.7M.
+This is a personal extra code from [Pytorch_Retinaface](https://github.com/biubug6/Pytorch_Retinaface) which is [PyTorch](https://pytorch.org/) implementation of [RetinaFace: Single-stage Dense Face Localisation in the Wild](https://arxiv.org/abs/1905.00641).  
+I tried to replace mobilenet0.25 backbone with mobilenetv3_small and mobilenetv3_large in [torchvision](https://pytorch.org/vision/0.8/models.html).  
+Each size of backbone model mobilenet0.25, mobilenetv3_small and mobilenetv3_large is 1.7M, 1.4M and 11.7M.
 
 ## WiderFace Val Performance in single scale When using Mobilenet0.25, MobilenetV3_small, MobilenetV3_large as backbone net.
 | Style | easy | medium | hard |
@@ -105,6 +106,7 @@ python test_fddb.py --trained_model weight_file --network mobile0.25 or mobilene
 <p align="center"><img src="curve/1.jpg" width="640"\></p>
 
 ### Evaluation inference time from random image
+1. You can evaluate inference time with random image input size each of VGA(640*480), HD(1920*1080) and 4K(4096*2160)
 ```shell
 python measure_inferenceTime.py --trained_model weight_file --network mobile0.25 or mobilenetv3sm or mobilenetv3lg
 ```
