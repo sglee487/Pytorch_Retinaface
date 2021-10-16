@@ -12,7 +12,7 @@ Each size of backbone model mobilenet0.25, mobilenetv3_small and mobilenetv3_lar
 | MobilenetV3_large (original image scale) | 93.21% | 91.63% | 80.43% |
 
 ## Inference time for each resolutions
-## Intel i5-8500 CPU, NVIDIA 1060GTX 6GB GPU
+Intel i5-8500 CPU, NVIDIA 1060GTX 6GB GPU
 | Backbone | VGA(640*480) | HD(1920*1080) | 4K(4096*2160)
 |:-|:-:|:-:|:-:|
 | Mobilenet0.25(GPU) | 7.45ms | 18.42ms | 73.46ms |
