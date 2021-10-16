@@ -4,7 +4,7 @@ import argparse
 import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
-from data import cfg_mnet, cfg_re50
+from data import cfg_mnet, cfg_re50, cfg_mv3smnet, cfg_mv3lgnet
 from layers.functions.prior_box import PriorBox
 from utils.nms.py_cpu_nms import py_cpu_nms
 import cv2
@@ -72,6 +72,10 @@ if __name__ == '__main__':
         cfg = cfg_mnet
     elif args.network == "resnet50":
         cfg = cfg_re50
+    elif args.network == "mobilenetv3sm":
+        cfg = cfg_mv3smnet
+    elif args.network == "mobilenetv3lg":
+        cfg = cfg_mv3lgnet
     # net and model
     net = RetinaFace(cfg=cfg, phase = 'test')
     net = load_model(net, args.trained_model, args.cpu)
@@ -108,6 +112,8 @@ if __name__ == '__main__':
         img = np.float32(img_raw)
         if resize != 1:
             img = cv2.resize(img, None, None, fx=resize, fy=resize, interpolation=cv2.INTER_LINEAR)
+        # print(img)
+        # print(image_path)
         im_height, im_width, _ = img.shape
         scale = torch.Tensor([img.shape[1], img.shape[0], img.shape[1], img.shape[0]])
         img -= (104, 117, 123)

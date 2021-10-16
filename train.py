@@ -5,7 +5,7 @@ import torch.optim as optim
 import torch.backends.cudnn as cudnn
 import argparse
 import torch.utils.data as data
-from data import WiderFaceDetection, detection_collate, preproc, cfg_mnet, cfg_re50
+from data import WiderFaceDetection, detection_collate, preproc, cfg_mnet, cfg_re50, cfg_mv3smnet, cfg_mv3lgnet
 from layers.modules import MultiBoxLoss
 from layers.functions.prior_box import PriorBox
 import time
@@ -24,6 +24,8 @@ parser.add_argument('--resume_epoch', default=0, type=int, help='resume iter for
 parser.add_argument('--weight_decay', default=5e-4, type=float, help='Weight decay for SGD')
 parser.add_argument('--gamma', default=0.1, type=float, help='Gamma update for SGD')
 parser.add_argument('--save_folder', default='./weights/', help='Location to save checkpoint models')
+parser.add_argument('--resume_weight', default=None, help='load trained weighted to resume train')
+parser.add_argument('--set_epoch', default=None, type=int, help='set epoch with ignoring cfg')
 
 args = parser.parse_args()
 
@@ -34,13 +36,20 @@ if args.network == "mobile0.25":
     cfg = cfg_mnet
 elif args.network == "resnet50":
     cfg = cfg_re50
+elif args.network == "mobilenetv3sm":
+    cfg = cfg_mv3smnet
+elif args.network == "mobilenetv3lg":
+    cfg = cfg_mv3lgnet
 
 rgb_mean = (104, 117, 123) # bgr order
 num_classes = 2
 img_dim = cfg['image_size']
 num_gpu = cfg['ngpu']
 batch_size = cfg['batch_size']
-max_epoch = cfg['epoch']
+if args.set_epoch is None:
+    max_epoch = cfg['epoch']
+else:
+    max_epoch = args.set_epoch
 gpu_train = cfg['gpu_train']
 
 num_workers = args.num_workers
@@ -70,10 +79,17 @@ if args.resume_net is not None:
         new_state_dict[name] = v
     net.load_state_dict(new_state_dict)
 
+if args.resume_weight is not None:
+    print('loading resume weight...')
+    net.load_state_dict(torch.load(args.resume_weight))
+    print('load weight done !')
+
 if num_gpu > 1 and gpu_train:
     net = torch.nn.DataParallel(net).cuda()
 else:
     net = net.cuda()
+
+
 
 cudnn.benchmark = True
 
@@ -108,7 +124,7 @@ def train():
         if iteration % epoch_size == 0:
             # create batch iterator
             batch_iterator = iter(data.DataLoader(dataset, batch_size, shuffle=True, num_workers=num_workers, collate_fn=detection_collate))
-            if (epoch % 10 == 0 and epoch > 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
+            if (epoch % 2 == 0 and epoch > 0) or (epoch % 5 == 0 and epoch > cfg['decay1']):
                 torch.save(net.state_dict(), save_folder + cfg['name']+ '_epoch_' + str(epoch) + '.pth')
             epoch += 1
 

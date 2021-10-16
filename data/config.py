@@ -40,3 +40,42 @@ cfg_re50 = {
     'out_channel': 256
 }
 
+cfg_mv3smnet = {
+    'name': 'mobilenetv3sm',
+    'min_sizes': [[16, 32], [64, 128], [256, 512]],
+    'steps': [8, 16, 32],
+    'variance': [0.1, 0.2],
+    'clip': False,
+    'loc_weight': 2.0,
+    'gpu_train': True,
+    'batch_size': 32,
+    'ngpu': 1,
+    'epoch': 250,
+    'decay1': 190,
+    'decay2': 220,
+    'image_size': 640,
+    'pretrain': True,
+    'return_layers': {'3': 0, '4': 1, '7': 2},
+    'in_channel': 32,
+    'out_channel': 64
+}
+
+cfg_mv3lgnet = {
+    'name': 'mobilenetv3lg',
+    'min_sizes': [[16, 32], [64, 128], [256, 512]],
+    'steps': [8, 16, 32],
+    'variance': [0.1, 0.2],
+    'clip': False,
+    'loc_weight': 2.0,
+    'gpu_train': True,
+    'batch_size': 16,
+    'ngpu': 1,
+    'epoch': 250,
+    'decay1': 190,
+    'decay2': 220,
+    'image_size': 640,
+    'pretrain': True,
+    'return_layers': {'6':0, '10':1, '15':2},
+    'in_channel': 20,
+    'out_channel': 64
+}

@@ -4,7 +4,7 @@ import argparse
 import torch
 import torch.backends.cudnn as cudnn
 import numpy as np
-from data import cfg_mnet, cfg_re50
+from data import cfg_mnet, cfg_re50, cfg_mv3smnet, cfg_mv3lgnet
 from layers.functions.prior_box import PriorBox
 from utils.nms.py_cpu_nms import py_cpu_nms
 import cv2
@@ -74,6 +74,10 @@ if __name__ == '__main__':
         cfg = cfg_mnet
     elif args.network == "resnet50":
         cfg = cfg_re50
+    elif args.network == "mobilenetv3sm":
+        cfg = cfg_mv3smnet
+    elif args.network == "mobilenetv3lg":
+        cfg = cfg_mv3lgnet
     # net and model
     net = RetinaFace(cfg=cfg, phase = 'test')
     net = load_model(net, args.trained_model, args.cpu)
@@ -96,6 +100,9 @@ if __name__ == '__main__':
 
     # testing begin
     for i, img_name in enumerate(test_dataset):
+        if img_name == '#': continue
+        if img_name.isdigit(): continue
+        if '.jpg' not in img_name: continue
         image_path = testset_folder + img_name
         img_raw = cv2.imread(image_path, cv2.IMREAD_COLOR)
         img = np.float32(img_raw)
@@ -104,9 +111,19 @@ if __name__ == '__main__':
         target_size = 1600
         max_size = 2150
         im_shape = img.shape
-        im_size_min = np.min(im_shape[0:2])
-        im_size_max = np.max(im_shape[0:2])
-        resize = float(target_size) / float(im_size_min)
+        # print(test_dataset)
+        # print(testset_list)
+        # print(image_path)
+        # print(img_raw)
+        # print(img)
+        # print(im_shape)
+        try:
+            im_size_min = np.min(im_shape[0:2])
+            im_size_max = np.max(im_shape[0:2])
+            resize = float(target_size) / float(im_size_min)
+        except ValueError as e:
+            print(e)
+            print(img_name)
         # prevent bigger axis from being more than max_size:
         if np.round(resize * im_size_max) > max_size:
             resize = float(max_size) / float(im_size_max)

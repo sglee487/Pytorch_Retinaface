@@ -68,14 +68,28 @@ class RetinaFace(nn.Module):
         elif cfg['name'] == 'Resnet50':
             import torchvision.models as models
             backbone = models.resnet50(pretrained=cfg['pretrain'])
+        elif cfg['name'] == 'mobilenetv3sm':
+            import torchvision.models as models
+            backbone = models.mobilenet_v3_small(pretrained=cfg['pretrain']).features
+            backbone[7].block[3][0].stride = (2, 2)
+        elif cfg['name'] == 'mobilenetv3lg':
+            import torchvision.models as models
+            backbone = models.mobilenet_v3_large(pretrained=cfg['pretrain']).features
 
         self.body = _utils.IntermediateLayerGetter(backbone, cfg['return_layers'])
-        in_channels_stage2 = cfg['in_channel']
-        in_channels_list = [
-            in_channels_stage2 * 2,
-            in_channels_stage2 * 4,
-            in_channels_stage2 * 8,
-        ]
+        if cfg['name'] in ('mobilenet0.25', 'Resnet50', 'mobilenetv3lg'):
+            in_channels_stage2 = cfg['in_channel']
+            in_channels_list = [
+                in_channels_stage2 * 2,
+                in_channels_stage2 * 4,
+                in_channels_stage2 * 8,
+            ]
+        elif cfg['name'] in ('mobilenetv3sm'):
+            in_channels_list = [
+                24,
+                40,
+                48,
+            ]
         out_channels = cfg['out_channel']
         self.fpn = FPN(in_channels_list,out_channels)
         self.ssh1 = SSH(out_channels, out_channels)
